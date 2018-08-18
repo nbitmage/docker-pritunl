@@ -1,0 +1,31 @@
+version: "3.5"
+services:
+  pritunl:
+    image: 'octarect/pritunl:latest'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "${PORT_HTTP:-443}:80"
+      - "${PORT_HTTPS:-443}:443"
+      - "${PORT_OVPN:-1194}:1194/tcp"
+      - "${PORT_OVPN:-1194}:1194/udp"
+    volumes:
+      - type: volume
+        source: data-mongodb
+        target: /data/db
+      - type: bind
+        source: ./log
+        target: /var/log
+      - type: bind
+        source: ${SSL_CERT_DIR}
+        target: /var/lib/pritunl/certs
+
+volumes:
+  data-mongodb:
+
+networks:
+  default:
+    external:
+        name: docker-mainline
